@@ -64,7 +64,7 @@ function defineImagesLoaded( EventEmitter, eventie ) {
     }
 
     this.elements = makeArray( elem );
-    this.options = extend( {}, this.options );
+    this.options = extend( { cache: true }, this.options );
 
     if ( typeof options === 'function' ) {
       onAlways = options;
@@ -118,7 +118,7 @@ function defineImagesLoaded( EventEmitter, eventie ) {
    * @param {Image} img
    */
   ImagesLoaded.prototype.addImage = function( img ) {
-    var loadingImage = new LoadingImage( img );
+    var loadingImage = new LoadingImage( img, this.options );
     this.images.push( loadingImage );
   };
 
@@ -194,8 +194,9 @@ function defineImagesLoaded( EventEmitter, eventie ) {
 
   var cache = {};
 
-  function LoadingImage( img ) {
+  function LoadingImage( img, options ) {
     this.img = img;
+    this.options = options;
   }
 
   LoadingImage.prototype = new EventEmitter();
@@ -203,7 +204,7 @@ function defineImagesLoaded( EventEmitter, eventie ) {
   LoadingImage.prototype.check = function() {
     // first check cached any previous images that have same src
     var cached = cache[ this.img.src ];
-    if ( cached ) {
+    if ( this.options.cache && cached ) {
       this.useCached( cached );
       return;
     }
